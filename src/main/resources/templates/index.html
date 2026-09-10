@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ज्ञानदीप वाचनालय | Gyandeep Vachnalay Library</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+
+  <section class="hero">
+    <div class="badges">
+      <span>📖 MPSC</span><span>👮 पोलीस भरती</span><span>🎯 इतर स्पर्धा परीक्षा</span>
+    </div>
+    <h1>ज्ञानदीप वाचनालय</h1>
+    <div class="tagline">वाचा, विचार करा आणि यश मिळवा.</div>
+    <p class="sub">A quiet, well-lit reading hall designed for serious competitive-exam preparation.
+      Reserve your seat, track your admission status, and manage your library membership — all in one place.</p>
+    <div class="badges mb-2">
+      <span>📍 At Post Nandurga, Ta. Ausa, Dist. Latur - 413520</span>
+      <span>💵 Admission Fee: ₹200 (Cash Only)</span>
+    </div>
+    <div class="cta-row">
+      <a th:href="@{/admission/new}" class="btn btn-gold" sec:authorize="isAuthenticated()">Fill Admission Form</a>
+      <a th:href="@{/register}" class="btn btn-gold" sec:authorize="!isAuthenticated()">Get Started &rarr;</a>
+      <a th:href="@{/login}" class="btn btn-outline" sec:authorize="!isAuthenticated()">Already a member? Login</a>
+      <a th:href="@{/profile}" class="btn btn-outline" sec:authorize="isAuthenticated()">Go to My Profile</a>
+    </div>
+  </section>
+
+  <div class="grid grid-3 mb-2">
+    <div class="card">
+      <div class="card-title">📝 Simple Admission</div>
+      <p class="muted">Submit your admission form online in minutes — choose your preferred shift and exam category.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ Role-based Access</div>
+      <p class="muted">Admins manage seats, users, and reports; members get a personal dashboard and profile.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">💺 Seat &amp; Shift Tracking</div>
+      <p class="muted">Once approved, your allotted seat number and membership validity are visible on your profile.</p>
+    </div>
+  </div>
+
+  <div class="card text-center" sec:authorize="!isAuthenticated()">
+    <div class="card-title" style="justify-content:center;">New here?</div>
+    <p class="muted mb-2">Create your free account, then fill out the admission form to reserve your library seat.</p>
+    <a th:href="@{/register}" class="btn btn-navy">Create an Account</a>
+  </div>
+
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

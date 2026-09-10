@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admissions | Admin</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+  <div class="dash-layout">
+    <div th:replace="~{admin/fragments :: sidebar('admissions')}"></div>
+
+    <div>
+      <div class="page-header">
+        <h1 class="section-title" style="margin:0;">📝 Admissions &amp; Seat Access</h1>
+      </div>
+
+      <div class="card mb-2">
+        <div class="flex gap-1" style="flex-wrap:wrap;">
+          <a th:href="@{/admin/admissions}" class="btn btn-sm" th:classappend="${selectedStatus == null} ? 'btn-navy' : 'btn-outline'" style="color:var(--navy-800); border-color:var(--navy-800);">All</a>
+          <a th:href="@{/admin/admissions(status='PENDING')}" class="btn btn-sm" th:classappend="${selectedStatus == 'PENDING'} ? 'btn-navy' : 'btn-outline'" style="color:var(--navy-800); border-color:var(--navy-800);">Pending</a>
+          <a th:href="@{/admin/admissions(status='APPROVED')}" class="btn btn-sm" th:classappend="${selectedStatus == 'APPROVED'} ? 'btn-navy' : 'btn-outline'" style="color:var(--navy-800); border-color:var(--navy-800);">Approved</a>
+          <a th:href="@{/admin/admissions(status='REJECTED')}" class="btn btn-sm" th:classappend="${selectedStatus == 'REJECTED'} ? 'btn-navy' : 'btn-outline'" style="color:var(--navy-800); border-color:var(--navy-800);">Rejected</a>
+        </div>
+      </div>
+
+      <div th:if="${admissions.isEmpty()}" class="card empty-state">
+        <div class="big-icon">📭</div>
+        <p>No admission requests found for this filter.</p>
+      </div>
+
+      <div class="table-wrap" th:unless="${admissions.isEmpty()}">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Applicant</th>
+              <th>Contact</th>
+              <th>Exam Category</th>
+              <th>Shift</th>
+              <th>Status</th>
+              <th>Fee (₹200)</th>
+              <th>Submitted</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="a : ${admissions}">
+              <td><strong th:text="${a.fullName}">Name</strong></td>
+              <td>
+                <div th:text="${a.phone}">phone</div>
+                <div class="muted" style="font-size:0.78rem;" th:text="${a.email}">email</div>
+              </td>
+              <td th:text="${a.examCategory}">MPSC</td>
+              <td th:text="${a.preferredShift}">Morning</td>
+              <td>
+                <span class="badge"
+                      th:classappend="${a.status.name() == 'APPROVED'} ? 'badge-approved' : (${a.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                      th:text="${a.status}">PENDING</span>
+              </td>
+              <td>
+                <span th:if="${a.feePaid}" class="badge badge-approved">Paid (Cash)</span>
+                <span th:unless="${a.feePaid}" class="badge badge-pending">Due</span>
+              </td>
+              <td th:text="${#temporals.format(a.createdAt, 'dd MMM yyyy')}">01 Jan 2026</td>
+              <td><a th:href="@{/admin/admissions/{id}(id=${a.id})}" class="btn btn-sm btn-navy">Review</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

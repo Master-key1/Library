@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | ज्ञानदीप वाचनालय</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+
+  <div class="profile-header">
+    <div class="avatar-circle" th:text="${#strings.substring(user.username,0,1).toUpperCase()}">U</div>
+    <div>
+      <h2 th:text="${user.username}">username</h2>
+      <div class="meta" th:text="${user.email}">email@example.com</div>
+      <span class="badge" th:classappend="${user.role.name() == 'ROLE_ADMIN'} ? 'badge-admin' : 'badge-user'"
+            th:text="${user.role.name() == 'ROLE_ADMIN'} ? 'Administrator' : 'Member'">Role</span>
+    </div>
+  </div>
+
+  <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+  <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+  <div class="grid grid-2">
+
+    <!-- Library / Admission status -->
+    <div class="card">
+      <div class="card-title">💺 Library Admission Status</div>
+
+      <div th:if="${user.admission == null}">
+        <p class="muted mb-2">You haven't submitted an admission form yet.</p>
+        <a th:href="@{/admission/new}" class="btn btn-gold">Fill Admission Form</a>
+      </div>
+
+      <div th:if="${user.admission != null}">
+        <div class="flex-between mb-1">
+          <span class="muted">Status</span>
+          <span class="badge"
+                th:classappend="${user.admission.status.name() == 'APPROVED'} ? 'badge-approved' : (${user.admission.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                th:text="${user.admission.status}">PENDING</span>
+        </div>
+        <div class="flex-between mb-1">
+          <span class="muted">Exam Category</span>
+          <strong th:text="${user.admission.examCategory}">MPSC</strong>
+        </div>
+        <div class="flex-between mb-1">
+          <span class="muted">Preferred Shift</span>
+          <strong th:text="${user.admission.preferredShift}">Morning</strong>
+        </div>
+        <div class="flex-between mb-1" th:if="${user.admission.seatNumber != null}">
+          <span class="muted">Seat Number</span>
+          <strong th:text="${user.admission.seatNumber}">A-12</strong>
+        </div>
+        <div class="flex-between mb-1" th:if="${user.admission.membershipValidTill != null}">
+          <span class="muted">Valid Till</span>
+          <strong th:text="${user.admission.membershipValidTill}">2027-01-01</strong>
+        </div>
+
+        <div class="mt-2" style="background:linear-gradient(135deg,#fff9ec,#fffdf7); border:1px solid #f2dfa8; border-left:4px solid var(--gold-500); border-radius:10px; padding:0.9rem 1rem;">
+          <div class="flex-between">
+            <span style="font-weight:700; color:#4b3c05; font-size:0.88rem;">💵 Admission Fee (Cash)</span>
+            <span th:if="${user.admission.feePaid}" class="badge badge-approved">Paid</span>
+            <span th:unless="${user.admission.feePaid}" class="badge badge-pending">Due — ₹200</span>
+          </div>
+          <p class="muted mt-1" style="font-size:0.8rem;" th:if="${!user.admission.feePaid}">
+            Pay ₹200 in cash at the library counter (At Post Nandurga, Ta. Ausa, Dist. Latur - 413520).
+          </p>
+          <p class="muted mt-1" style="font-size:0.8rem;" th:if="${user.admission.feePaid and user.admission.receiptNumber != null}">
+            Receipt No: <strong th:text="${user.admission.receiptNumber}">R-001</strong>
+          </p>
+        </div>
+
+        <div class="mt-1" th:if="${user.admission.adminRemarks != null and !user.admission.adminRemarks.isEmpty()}">
+          <span class="muted">Admin Remarks:</span>
+          <p style="margin-top:0.3rem;" th:text="${user.admission.adminRemarks}"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Access rights -->
+    <div class="card">
+      <div class="card-title">🔐 My Access Rights</div>
+      <div th:if="${user.role.name() == 'ROLE_ADMIN'}">
+        <p class="muted mb-1">As an administrator, you have full access to the library management system.</p>
+      </div>
+      <div class="access-grid">
+        <div class="access-item" th:classappend="${user.role.name() == 'ROLE_ADMIN' or user.canManageAdmissions} ? 'on' : 'off'">
+          <span class="dot"></span><span class="txt">Manage Admissions</span>
+        </div>
+        <div class="access-item" th:classappend="${user.role.name() == 'ROLE_ADMIN' or user.canManageBooks} ? 'on' : 'off'">
+          <span class="dot"></span><span class="txt">Manage Library Books</span>
+        </div>
+        <div class="access-item" th:classappend="${user.role.name() == 'ROLE_ADMIN' or user.canManageUsers} ? 'on' : 'off'">
+          <span class="dot"></span><span class="txt">Manage User Accounts</span>
+        </div>
+        <div class="access-item" th:classappend="${user.role.name() == 'ROLE_ADMIN' or user.canViewReports} ? 'on' : 'off'">
+          <span class="dot"></span><span class="txt">View Reports</span>
+        </div>
+      </div>
+      <p class="muted mt-2" style="font-size:0.82rem;" sec:authorize="!hasAuthority('ROLE_ADMIN')">
+        Need extended access? Contact your library administrator.
+      </p>
+    </div>
+
+    <!-- Update profile -->
+    <div class="card">
+      <div class="card-title">✏️ Update Contact Details</div>
+      <form th:action="@{/profile/update}" method="post">
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input class="form-control" type="tel" id="phone" name="phone" th:value="${user.phone}">
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <textarea class="form-control" id="address" name="address" th:text="${user.address}"></textarea>
+        </div>
+        <button type="submit" class="btn btn-navy">Save Changes</button>
+      </form>
+    </div>
+
+    <!-- Change password -->
+    <div class="card">
+      <div class="card-title">🔑 Change Password</div>
+      <form th:action="@{/profile/change-password}" method="post">
+        <div class="form-group">
+          <label for="newPassword">New Password</label>
+          <input class="form-control" type="password" id="newPassword" name="newPassword" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm New Password</label>
+          <input class="form-control" type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn btn-navy">Update Password</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

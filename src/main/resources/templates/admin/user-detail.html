@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Access | Admin</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+  <div class="dash-layout">
+    <div th:replace="~{admin/fragments :: sidebar('users')}"></div>
+
+    <div>
+      <div class="page-header">
+        <h1 class="section-title" style="margin:0;">🔐 Manage User Access</h1>
+        <a th:href="@{/admin/users}" class="btn btn-outline btn-sm" style="color:var(--navy-800); border-color:var(--navy-800);">&larr; Back to Users</a>
+      </div>
+
+      <div class="alert alert-success" th:if="${param.updated}">Access rights updated successfully.</div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">👤 Account Details</div>
+          <div class="flex-between mb-1"><span class="muted">Username</span><strong th:text="${targetUser.username}">u</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Email</span><strong th:text="${targetUser.email}">e</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Role</span>
+            <span class="badge" th:classappend="${targetUser.role.name() == 'ROLE_ADMIN'} ? 'badge-admin' : 'badge-user'"
+                  th:text="${targetUser.role.name() == 'ROLE_ADMIN'} ? 'Admin' : 'Member'">Role</span>
+          </div>
+          <div class="flex-between mb-1"><span class="muted">Joined</span><strong th:text="${#temporals.format(targetUser.createdAt,'dd MMM yyyy')}">d</strong></div>
+
+          <div class="mt-2" th:if="${targetUser.admission != null}">
+            <div class="card-title" style="font-size:1rem;">Library Admission</div>
+            <div class="flex-between mb-1"><span class="muted">Status</span>
+              <span class="badge"
+                    th:classappend="${targetUser.admission.status.name() == 'APPROVED'} ? 'badge-approved' : (${targetUser.admission.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                    th:text="${targetUser.admission.status}">P</span>
+            </div>
+            <div class="flex-between mb-1" th:if="${targetUser.admission.seatNumber != null}"><span class="muted">Seat</span><strong th:text="${targetUser.admission.seatNumber}">A-1</strong></div>
+            <a th:href="@{/admin/admissions/{id}(id=${targetUser.admission.id})}" class="btn btn-sm btn-navy mt-1">Review Admission &rarr;</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🛡️ Library Access Permissions</div>
+          <p class="muted mb-2" style="font-size:0.85rem;">Grant this user staff-level access to manage parts of the library system, independent of their base role.</p>
+
+          <form th:action="@{/admin/users/{id}/access(id=${targetUser.id})}" method="post">
+            <div class="checkbox-row">
+              <input type="checkbox" id="canManageAdmissions" name="canManageAdmissions" value="true" th:checked="${targetUser.canManageAdmissions}">
+              <label for="canManageAdmissions">Manage Admissions (review &amp; approve seat requests)</label>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="canManageBooks" name="canManageBooks" value="true" th:checked="${targetUser.canManageBooks}">
+              <label for="canManageBooks">Manage Library Books &amp; Catalog</label>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="canManageUsers" name="canManageUsers" value="true" th:checked="${targetUser.canManageUsers}">
+              <label for="canManageUsers">Manage User Accounts</label>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="canViewReports" name="canViewReports" value="true" th:checked="${targetUser.canViewReports}">
+              <label for="canViewReports">View Reports &amp; Analytics</label>
+            </div>
+            <div class="checkbox-row">
+              <input type="checkbox" id="enabled" name="enabled" value="true" th:checked="${targetUser.enabled}">
+              <label for="enabled">Account Enabled (unchecking blocks login)</label>
+            </div>
+
+            <button type="submit" class="btn btn-navy btn-block mt-2">Save Access Rights</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

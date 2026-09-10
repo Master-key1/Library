@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users &amp; Access | Admin</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+  <div class="dash-layout">
+    <div th:replace="~{admin/fragments :: sidebar('users')}"></div>
+
+    <div>
+      <div class="page-header">
+        <h1 class="section-title" style="margin:0;">👤 Users &amp; Access Rights</h1>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Admission</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="u : ${users}">
+              <td><strong th:text="${u.username}">username</strong></td>
+              <td th:text="${u.email}">email</td>
+              <td>
+                <span class="badge" th:classappend="${u.role.name() == 'ROLE_ADMIN'} ? 'badge-admin' : 'badge-user'"
+                      th:text="${u.role.name() == 'ROLE_ADMIN'} ? 'Admin' : 'Member'">Role</span>
+              </td>
+              <td>
+                <span th:if="${u.enabled}" style="color:var(--success); font-weight:700;">● Active</span>
+                <span th:unless="${u.enabled}" style="color:var(--danger); font-weight:700;">● Disabled</span>
+              </td>
+              <td>
+                <span th:if="${u.admission == null}" class="muted">No request</span>
+                <span th:if="${u.admission != null}" class="badge"
+                      th:classappend="${u.admission.status.name() == 'APPROVED'} ? 'badge-approved' : (${u.admission.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                      th:text="${u.admission.status}">PENDING</span>
+              </td>
+              <td><a th:href="@{/admin/users/{id}(id=${u.id})}" class="btn btn-sm btn-navy">Manage Access</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

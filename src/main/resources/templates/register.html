@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | ज्ञानदीप वाचनालय</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="brand-mark">
+      <div class="logo-badge">ज्ञा</div>
+      <h2>Create Your Account</h2>
+      <p class="sub">Register to access the admission form &amp; your member profile</p>
+    </div>
+
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/register}" th:object="${registerForm}" method="post">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input class="form-control" type="text" id="username" th:field="*{username}" required placeholder="Choose a username">
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input class="form-control" type="email" id="email" th:field="*{email}" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input class="form-control" type="password" id="password" th:field="*{password}" required placeholder="At least 4 characters">
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input class="form-control" type="password" id="confirmPassword" th:field="*{confirmPassword}" required placeholder="Re-enter password">
+      </div>
+      <button type="submit" class="btn btn-navy btn-block">Create Account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a th:href="@{/login}" style="font-weight:700;">Login here</a>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

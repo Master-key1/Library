@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | ज्ञानदीप वाचनालय</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+  <div class="dash-layout">
+    <div th:replace="~{admin/fragments :: sidebar('dashboard')}"></div>
+
+    <div>
+      <div class="page-header">
+        <h1 class="section-title" style="margin:0;">📊 Admin Dashboard</h1>
+        <span class="chip">Library Access Control Center</span>
+      </div>
+
+      <div class="grid grid-4 mb-2">
+        <div class="stat-tile navy">
+          <div class="num" th:text="${totalAdmissions}">0</div>
+          <div class="label">Total Admissions</div>
+        </div>
+        <div class="stat-tile">
+          <div class="num" th:text="${pendingCount}">0</div>
+          <div class="label">Pending Review</div>
+        </div>
+        <div class="stat-tile success">
+          <div class="num" th:text="${approvedCount}">0</div>
+          <div class="label">Approved Seats</div>
+        </div>
+        <div class="stat-tile danger">
+          <div class="num" th:text="${rejectedCount}">0</div>
+          <div class="label">Rejected</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 mb-2">
+        <div class="stat-tile" style="border-left-color:#d4a017;">
+          <div class="num" th:text="${feePendingCount}">0</div>
+          <div class="label">💵 Admission Fees Pending (₹200 Cash Each)</div>
+        </div>
+        <div class="stat-tile success">
+          <div class="num" th:text="${totalAdmissions - feePendingCount}">0</div>
+          <div class="label">Fees Collected</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">🕒 Recent Admission Requests</div>
+          <div th:if="${recentAdmissions.isEmpty()}" class="empty-state">
+            <div class="big-icon">📭</div>
+            <p>No admission requests yet.</p>
+          </div>
+          <table class="data-table" th:unless="${recentAdmissions.isEmpty()}" style="box-shadow:none;">
+            <tbody>
+              <tr th:each="a : ${recentAdmissions}">
+                <td>
+                  <strong th:text="${a.fullName}">Name</strong><br>
+                  <span class="muted" style="font-size:0.78rem;" th:text="${a.examCategory}">MPSC</span>
+                </td>
+                <td>
+                  <span class="badge"
+                        th:classappend="${a.status.name() == 'APPROVED'} ? 'badge-approved' : (${a.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                        th:text="${a.status}">PENDING</span>
+                </td>
+                <td><a th:href="@{/admin/admissions/{id}(id=${a.id})}" class="btn btn-sm btn-navy">Review</a></td>
+              </tr>
+            </tbody>
+          </table>
+          <a th:href="@{/admin/admissions}" class="btn btn-outline btn-sm mt-2" style="color:var(--navy-800); border-color:var(--navy-800);">View All Admissions &rarr;</a>
+        </div>
+
+        <div class="card">
+          <div class="card-title">👥 System Overview</div>
+          <div class="flex-between mb-1">
+            <span class="muted">Total Registered Users</span>
+            <strong th:text="${totalUsers}">0</strong>
+          </div>
+          <div class="flex-between mb-1">
+            <span class="muted">Approved Members</span>
+            <strong th:text="${approvedCount}">0</strong>
+          </div>
+          <div class="flex-between mb-1">
+            <span class="muted">Awaiting Review</span>
+            <strong th:text="${pendingCount}">0</strong>
+          </div>
+          <a th:href="@{/admin/users}" class="btn btn-outline btn-sm mt-2" style="color:var(--navy-800); border-color:var(--navy-800);">Manage Users &amp; Access &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>

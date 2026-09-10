@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<div th:fragment="navbar">
+  <header class="navbar">
+    <a href="/" class="brand" style="color:#fff;">
+      <span class="logo-badge">ज्ञा</span>
+      <span>
+        ज्ञानदीप वाचनालय
+        <small>Gyandeep Vachnalay &middot; MPSC | पोलीस भरती | इतर स्पर्धा परीक्षा</small>
+      </span>
+    </a>
+    <nav>
+      <a href="/" sec:authorize="!isAuthenticated()">Home</a>
+      <a href="/admission/new" sec:authorize="isAuthenticated()">Admission Form</a>
+      <a href="/profile" sec:authorize="isAuthenticated()">My Profile</a>
+      <a href="/admin/dashboard" sec:authorize="hasAuthority('ROLE_ADMIN')">Admin Panel</a>
+      <a href="/login" class="pill" sec:authorize="!isAuthenticated()">Login</a>
+      <a href="/register" sec:authorize="!isAuthenticated()">Register</a>
+      <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()" style="display:inline;">
+        <button type="submit" class="link-btn">Logout (<span sec:authentication="name">user</span>)</button>
+      </form>
+    </nav>
+  </header>
+</div>
+
+<div th:fragment="footer">
+  <footer class="site-footer">
+    &copy; <span th:text="${#temporals.year(#temporals.createNow())}">2026</span> ज्ञानदीप वाचनालय (Gyandeep Vachnalay) &middot; वाचा, विचार करा आणि यश मिळवा.
+  </footer>
+</div>
+
+</body>
+</html>

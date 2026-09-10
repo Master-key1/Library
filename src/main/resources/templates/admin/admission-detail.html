@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Admission | Admin</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="page-wrap">
+  <div class="dash-layout">
+    <div th:replace="~{admin/fragments :: sidebar('admissions')}"></div>
+
+    <div>
+      <div class="page-header">
+        <h1 class="section-title" style="margin:0;">🔍 Review Admission</h1>
+        <a th:href="@{/admin/admissions}" class="btn btn-outline btn-sm" style="color:var(--navy-800); border-color:var(--navy-800);">&larr; Back to List</a>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-title">Applicant Details</div>
+          <div class="flex-between mb-1"><span class="muted">Full Name</span><strong th:text="${admission.fullName}">Name</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Gender</span><strong th:text="${admission.gender}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Date of Birth</span><strong th:text="${admission.dateOfBirth}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Phone</span><strong th:text="${admission.phone}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Email</span><strong th:text="${admission.email}">-</strong></div>
+          <div class="mb-1"><span class="muted">Address</span><p style="margin-top:0.3rem;" th:text="${admission.address}">-</p></div>
+          <div class="flex-between mb-1"><span class="muted">Village / Taluka / District</span>
+            <strong th:text="${admission.village} + ' / ' + ${admission.taluka} + ' / ' + ${admission.district}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">PIN Code</span><strong th:text="${admission.pincode}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Qualification</span><strong th:text="${admission.qualification}">-</strong></div>
+          <div class="flex-between mb-1" th:if="${admission.college != null and !admission.college.isEmpty()}"><span class="muted">College</span><strong th:text="${admission.college}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Exam Category</span><strong th:text="${admission.examCategory}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Membership Type</span><strong th:text="${admission.membershipType}">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Preferred Shift</span><strong th:text="${admission.preferredShift}">-</strong></div>
+          <div class="flex-between mb-1" th:if="${admission.requiredFacility != null and !admission.requiredFacility.isEmpty()}"><span class="muted">Required Facility</span><strong th:text="${admission.requiredFacility}">-</strong></div>
+          <div class="flex-between mb-1" th:if="${admission.parentName != null and !admission.parentName.isEmpty()}"><span class="muted">Emergency Contact</span><strong th:text="${admission.parentName} + (${admission.parentMobile} != null ? ' (' + ${admission.parentMobile} + ')' : '')">-</strong></div>
+          <div class="flex-between mb-1"><span class="muted">Submitted</span><strong th:text="${#temporals.format(admission.createdAt, 'dd MMM yyyy, hh:mm a')}">-</strong></div>
+          <div class="flex-between">
+            <span class="muted">Current Status</span>
+            <span class="badge"
+                  th:classappend="${admission.status.name() == 'APPROVED'} ? 'badge-approved' : (${admission.status.name() == 'REJECTED'} ? 'badge-rejected' : 'badge-pending')"
+                  th:text="${admission.status}">PENDING</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="card mb-2" style="background:linear-gradient(135deg,#fff9ec,#fffdf7); border:1px solid #f2dfa8; border-left:4px solid var(--gold-500);">
+            <div class="card-title">💵 Admission Fee &amp; Cash Collection</div>
+            <div class="flex-between mb-1">
+              <span class="muted">Amount Due</span>
+              <strong th:text="'₹' + ${admission.admissionFee} + '/-'">₹200/-</strong>
+            </div>
+            <div class="flex-between mb-1">
+              <span class="muted">Payment Mode</span>
+              <strong th:text="${admission.paymentMode}">Cash</strong>
+            </div>
+            <div class="flex-between mb-1">
+              <span class="muted">Fee Status</span>
+              <span th:if="${admission.feePaid}" class="badge badge-approved">Paid</span>
+              <span th:unless="${admission.feePaid}" class="badge badge-pending">Pending</span>
+            </div>
+
+            <div th:if="${admission.feePaid}" class="mt-1">
+              <div class="flex-between mb-1" th:if="${admission.receiptNumber != null}"><span class="muted">Receipt No.</span><strong th:text="${admission.receiptNumber}">-</strong></div>
+              <div class="flex-between mb-1" th:if="${admission.collectedBy != null}"><span class="muted">Collected By</span><strong th:text="${admission.collectedBy}">-</strong></div>
+              <div class="flex-between" th:if="${admission.feePaidAt != null}"><span class="muted">Paid At</span><strong th:text="${#temporals.format(admission.feePaidAt, 'dd MMM yyyy, hh:mm a')}">-</strong></div>
+            </div>
+
+            <form th:unless="${admission.feePaid}" th:action="@{/admin/admissions/{id}/mark-fee-paid(id=${admission.id})}" method="post" class="mt-2">
+              <div class="form-group">
+                <label for="receiptNumber">Receipt Number</label>
+                <input class="form-control" type="text" id="receiptNumber" name="receiptNumber" placeholder="e.g. R-045">
+              </div>
+              <div class="form-group">
+                <label for="collectedBy">Cash Collected By</label>
+                <input class="form-control" type="text" id="collectedBy" name="collectedBy" placeholder="Staff / your name">
+              </div>
+              <button type="submit" class="btn btn-gold btn-block">Mark ₹200 Fee as Paid (Cash)</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-title">✅ Approve &amp; Assign Seat</div>
+            <form th:action="@{/admin/admissions/{id}/approve(id=${admission.id})}" method="post">
+              <div class="form-group">
+                <label for="seatNumber">Seat Number</label>
+                <input class="form-control" type="text" id="seatNumber" name="seatNumber"
+                       th:value="${admission.seatNumber}" placeholder="e.g. A-12" required>
+              </div>
+              <div class="form-group">
+                <label for="validTill">Membership Valid Till</label>
+                <input class="form-control" type="date" id="validTill" name="validTill"
+                       th:value="${admission.membershipValidTill}" required>
+              </div>
+              <div class="form-group">
+                <label for="approveRemarks">Remarks (optional)</label>
+                <textarea class="form-control" id="approveRemarks" name="remarks" placeholder="Any notes for the applicant"></textarea>
+              </div>
+              <button type="submit" class="btn btn-success btn-block">Approve Admission</button>
+            </form>
+
+            <hr style="margin:1.5rem 0; border:none; border-top:1px solid #eef0f5;">
+
+            <div class="card-title" style="font-size:1rem;">❌ Reject Request</div>
+            <form th:action="@{/admin/admissions/{id}/reject(id=${admission.id})}" method="post">
+              <div class="form-group">
+                <label for="rejectRemarks">Reason for Rejection</label>
+                <textarea class="form-control" id="rejectRemarks" name="remarks" placeholder="Explain why this request is rejected"></textarea>
+              </div>
+              <button type="submit" class="btn btn-danger btn-block">Reject Admission</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-2" th:if="${admission.adminRemarks != null and !admission.adminRemarks.isEmpty()}">
+        <div class="card-title">🗒️ Latest Admin Remarks</div>
+        <p th:text="${admission.adminRemarks}"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments :: footer}"></div>
+</body>
+</html>
